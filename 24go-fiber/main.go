@@ -31,11 +31,10 @@ func (r *Repository) CreateBook(context *fiber.Ctx) error {
 		return err
 	}
 
-	err := r.DB.Create(&book).Error
+	err = r.DB.Create(&book).Error
 	if err != nil {
 		context.Status(http.StatusBadRequest).JSON(
-			&fiber.Map{"message": "could not create book"},
-		)
+			&fiber.Map{"message": "could not create book"})
 		return err
 	}
 	context.Status(http.StatusOK).JSON(
@@ -96,11 +95,11 @@ func (r *Repository) DeleteBook(context *fiber.Ctx) error {
 		return nil
 	}
 	err := r.DB.Delete(bookModel, id)
-	if err != nil {
+	if err.Error != nil {
 		context.Status(http.StatusBadRequest).JSON(
 			&fiber.Map{"message": "could not delete books"},
 		)
-		return err
+		return err.Error
 	}
 
 	context.Status(http.StatusOK).JSON(&fiber.Map{
@@ -131,7 +130,7 @@ func main() {
 	r := Repository{
 		DB: db,
 	}
-	err := models.MigrateBooks(db)
+	err = models.MigrateBooks(db)
 	CheckIfError(err)
 	app := fiber.New()
 	r.SetupRoutes(app)
